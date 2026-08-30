@@ -1,0 +1,14 @@
+{
+    "name": "libx264",
+    "description": "H.264/AVC encoder (native libx264)",
+    "filters":["encx264"],
+    "help": "This filter encodes a raw YUV420 video PID to H.264/AVC by calling libx264's native API directly, without going through FFmpeg.",
+    "support": [
+        "video"
+    ],
+    "sources":"https://bevara.ddns.net/sources/libx264.accessor",
+    "filter_source":{
+        "encx264" : "enc_x264.c"
+    },
+    "licence_required":true
+}
