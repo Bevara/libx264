@@ -368,7 +368,7 @@ GF_FilterRegister X264EncRegister = {
 	.finalize = x264enc_finalize,
 };
 
-const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE dynCall_encx264_register(GF_FilterSession *session)
+const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE encx264_register(GF_FilterSession *session)
 {
 	return &X264EncRegister;
 }
@@ -376,5 +376,5 @@ const GF_FilterRegister * EMSCRIPTEN_KEEPALIVE dynCall_encx264_register(GF_Filte
 #include "filter_register.h"
 __attribute__((constructor))
 void register_encx264(void) {
-    gf_filter_auto_register("encx264", dynCall_encx264_register);
+    gf_filter_auto_register("encx264", encx264_register);
 }
