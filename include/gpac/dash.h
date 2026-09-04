@@ -2,7 +2,7 @@
  *			GPAC - Multimedia Framework C SDK
  *
  *			Authors: Jean Le Feuvre
- *			Copyright (c) Telecom ParisTech 2012-2023
+ *			Copyright (c) Telecom ParisTech 2012-2026
  *					All rights reserved
  *
  *  This file is part of GPAC / Adaptive HTTP Streaming sub-project
@@ -161,8 +161,7 @@ struct _gf_dash_io
 typedef struct __dash_client GF_DashClient;
 
 /*! Quality selection mode of initial segments*/
-typedef enum
-{
+GF_OPT_ENUM (GF_DASHInitialSelectionMode,
 	/*! selects the lowest quality when starting - if one of the representation does not have video (HLS), it may be selected*/
 	GF_DASH_SELECT_QUALITY_LOWEST=0,
 	/*! selects the highest quality when starting*/
@@ -172,8 +171,8 @@ typedef enum
 	/*! selects the highest bandwidth when starting - for tiles all low priority tiles will have the lower (below max) bandwidth selected*/
 	GF_DASH_SELECT_BANDWIDTH_HIGHEST,
 	/*! selects the highest bandwidth when starting - for tiles all low priority tiles will have their lowest bandwidth selected*/
-	GF_DASH_SELECT_BANDWIDTH_HIGHEST_TILES
-} GF_DASHInitialSelectionMode;
+	GF_DASH_SELECT_BANDWIDTH_HIGHEST_TILES,
+);
 
 
 /*! create a new DASH client
@@ -330,7 +329,10 @@ s32 gf_dash_get_dependent_group_index(GF_DashClient *dash, u32 group_idx, u32 gr
 */
 Bool gf_dash_is_group_selectable(GF_DashClient *dash, u32 group_idx);
 
-/*! selects a group for playback. If group selection is enabled,  other groups are alternate to this group (through the group attribute), they are automatically deselected
+/*! selects a group for playback. If group selection is enabled, other groups are alternate to this group (through the group attribute), they are automatically deselected
+
+ Seeking is NOT performed, it is the responsability to call \ref gf_dash_group_seek - this can be called before or after selecting
+
 \param dash the target dash client
 \param group_idx the 0-based index of the target group
 \param select if GF_TRUE, will select this group and disable any alternate group. If GF_FALSE, only deselects the group
@@ -344,13 +346,13 @@ void gf_dash_group_select(GF_DashClient *dash, u32 group_idx, Bool select);
 */
 s32 gf_dash_group_get_id(GF_DashClient *dash, u32 group_idx);
 
-/*! gets cuirrent period ID
+/*! gets current period ID
 \param dash the target dash client
 \return ID of the current period or NULL
 */
 const char*gf_dash_get_period_id(GF_DashClient *dash);
 
-/*! enables group selection  through the group attribute
+/*! enables group selection through the group attribute
 \param dash the target dash client
 \param enable if GF_TRUE, group selection will be done whenever selecting a new group
 */
@@ -369,21 +371,15 @@ Bool gf_dash_group_init_segment_is_media(GF_DashClient *dash, u32 group_idx);
 */
 void gf_dash_groups_set_language(GF_DashClient *dash, const char *lang_code_rfc_5646);
 
-/*! returns the mime type of the media resources in this group
-\param dash the target dash client
-\param group_idx the 0-based index of the target group
-\return the mime type of the segments in this group
-*/
-const char *gf_dash_group_get_segment_mime(GF_DashClient *dash, u32 group_idx);
-
 /*! returns the URL of the first media resource to play (init segment or first media segment depending on format). start_range and end_range are optional
 \param dash the target dash client
 \param group_idx the 0-based index of the target group
 \param start_range set to the byte start offset in the init segment
 \param end_range set to the byte end offset in the init segment
+\param mime the mime type of the init segment
 \return URL of the init segment (can be a relative path if manifest is a local file)
 */
-const char *gf_dash_group_get_segment_init_url(GF_DashClient *dash, u32 group_idx, u64 *start_range, u64 *end_range);
+const char *gf_dash_group_get_segment_init_url(GF_DashClient *dash, u32 group_idx, u64 *start_range, u64 *end_range, const char **mime);
 
 /*! returns the URL and IV associated with the first media segment if any (init segment or first media segment depending on format).
 This is used for full segment encryption modes of MPEG-2 TS segments. key_IV is optional
@@ -402,7 +398,7 @@ const char *gf_dash_group_get_segment_init_keys(GF_DashClient *dash, u32 group_i
 */
 const char *gf_dash_group_get_language(GF_DashClient *dash, u32 group_idx);
 
-/*! returns the number of audio channelsof the group
+/*! returns the number of audio channels of the group
 \param dash the target dash client
 \param group_idx the 0-based index of the target group
 \return the number of audio channels, or 0 if not audio or unspecified
@@ -504,11 +500,12 @@ Bool gf_dash_group_enum_descriptor(GF_DashClient *dash, u32 group_idx, GF_DashDe
 \param key_url set to the key URL of the next segment for MPEG-2 TS full segment encryption (optional, may be NULL). The URL is either a URN or a resolved URL
 \param key_IV set to the key initialization vector of the next segment for MPEG-2 TS full segment encryption (optional, may be NULL)
 \param utc set to UTC mapping for first sample of segment, 0 if none defined
+\param hls_disc_idx set to HLS discontinuity sequence index, 0 otherwise
 \return GF_BUFFER_TOO_SMALL if no segment found, GF_EOS if end of session, GF_URL_REMOVED if segment is disabled (but all output info is OK, this can be ignored and considered as GF_OK by the user) or error if any
 */
 GF_Err gf_dash_group_get_next_segment_location(GF_DashClient *dash, u32 group_idx, u32 dependent_representation_index, const char **url, u64 *start_range, u64 *end_range,
         s32 *switching_index, const char **switching_url, u64 *switching_start_range, u64 *switching_end_range,
-        const char **original_url, Bool *has_next_segment, const char **key_url, bin128 *key_IV, u64 *utc);
+        const char **original_url, Bool *has_next_segment, const char **key_url, bin128 *key_IV, u64 *utc, u32 *hls_disc_idx);
 
 /*! gets some info on the segment
 \param dash the target dash client
@@ -735,15 +732,14 @@ void gf_dash_debug_groups(GF_DashClient *dash, const u32 *groups_idx, u32 nb_gro
 void gf_dash_split_adaptation_sets(GF_DashClient *dash);
 
 /*! low latency mode of dash client*/
-typedef enum
-{
+GF_OPT_ENUM (GF_DASHLowLatencyMode,
 	/*! disable low latency*/
 	GF_DASH_LL_DISABLE = 0,
 	/*! strict respect of segment availability start time*/
 	GF_DASH_LL_STRICT,
 	/*! allow fetching segments earlier than their availability start time in case of empty demux*/
 	GF_DASH_LL_EARLY_FETCH,
-} GF_DASHLowLatencyMode;
+);
 
 /*! allow early segment fetch in low latency mode
 \param dash the target dash client
@@ -782,12 +778,32 @@ Errors will be thrown if these are not met on future parts and merging will be d
 */
 void gf_dash_enable_single_range_llhls(GF_DashClient *dash, Bool enable_single_range);
 
-/*! create a new DASH client
+/*! enable auto-switch mode
 \param dash the target dash cleint
 \param auto_switch_count forces representation switching (quality up if positive, down if negative) every auto_switch_count segments, set to 0 to disable
 \param auto_switch_loop if false (default when creating dasher), restart at lowest quality when higher quality is reached and vice-versa. If true, quality switches decreases then increase in loop
 */
 void gf_dash_set_auto_switch(GF_DashClient *dash, s32 auto_switch_count, Bool auto_switch_loop);
+
+/*! Cross Adaptation-set switching mdoe */
+GF_OPT_ENUM (GF_DASHCrossASMode,
+	/*! cross adaptation set is disabled*/
+	GF_DASH_XAS_NONE = 0,
+	/*! cross adaptation set is enabled and only switches on the same codec*/
+	GF_DASH_XAS_CODEC,
+	/*! cross adaptation set is enabled and can switch to any codec*/
+	GF_DASH_XAS_ALL,
+);
+
+/*! enable switching across adaptation sets
+
+When switching across adaptation sets is enabled and such sets are declared in the manifest, a single group will be declared for all sets in
+the switching set, and switching will be handled by the client.
+
+\param dash the target dash cleint
+\param cross_as_mode enable or disable
+*/
+void gf_dash_enable_cross_as_switch(GF_DashClient *dash, GF_DASHCrossASMode cross_as_mode);
 
 /*! returns active period start
 \param dash the target dash client
@@ -861,6 +877,10 @@ typedef struct
 	Double average_duration;
 	/*! list of segmentURLs if known, NULL otherwise. Used for onDemand profile to get segment sizes*/
 	const GF_List *seg_urls;
+	/*! URL (relative) of variant playlist*/
+	const char *hls_variant_url;
+	/*! SSR flag, set to estimated num parts in SSR */
+	u32 ssr;
 } GF_DASHQualityInfo;
 
 /*! gets information on  a given quality
@@ -919,8 +939,7 @@ void gf_dash_override_ntp(GF_DashClient *dash, u64 server_ntp);
 /*! Tile adaptation mode
 This mode specifies how bitrate is allocated across tiles of the same video
 */
-typedef enum
-{
+GF_OPT_ENUM(GF_DASHTileAdaptationMode,
 	/*! each tile receives the same amount of bitrate (default strategy)*/
 	GF_DASH_ADAPT_TILE_NONE=0,
 	/*! bitrate decreases for each row of tiles starting from the top, same rate for each tile on the row*/
@@ -939,7 +958,7 @@ typedef enum
 	GF_DASH_ADAPT_TILE_CENTER,
 	/*! bitrate decreased for all tiles on the center of the picture*/
 	GF_DASH_ADAPT_TILE_EDGES,
-} GF_DASHTileAdaptationMode;
+);
 
 /*! sets tile adaptation mode
 \param dash the target dash client
@@ -1081,12 +1100,12 @@ void gf_dash_group_store_stats(GF_DashClient *dash, u32 group_idx, u32 dep_rep_i
 */
 void gf_dash_set_suggested_presentation_delay(GF_DashClient *dash, s32 spd);
 
-/*! sets availabilityStartTime shift for ROUTE. By default the ROUTE tune-in is done by matching the last received segment name
-to the segment template and deriving the ROUTE UTC reference from that. The function allows shifting the computed value by a given amount.
+/*! sets availabilityStartTime shift for multicast (ROUTE, FLUTE). By default the multicast tune-in is done by matching the last received segment name
+to the segment template and deriving the UTC reference from that. The function allows shifting the computed value by a given amount.
 \param dash the target dash client
-\param ast_shift clock shift in milliseconds of the ROUTE receiver tune-in. Positive values shift the clock in the future, negative ones in the past
+\param ast_shift clock shift in milliseconds of the multicast receiver tune-in. Positive values shift the clock in the future, negative ones in the past
 */
-void gf_dash_set_route_ast_shift(GF_DashClient *dash, s32 ast_shift);
+void gf_dash_set_mcast_ast_shift(GF_DashClient *dash, s32 ast_shift);
 
 /*! gets the minimum wait time before calling \ref gf_dash_process again for unthreaded mode
 \param dash the target dash client

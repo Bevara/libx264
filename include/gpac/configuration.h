@@ -46,6 +46,8 @@ This section documents the base data types of GPAC.
 /*Configuration for visual studio, 32/64 bits */
 #if defined(_WIN32) && !defined(_WIN32_WCE)
 
+#define WIN32_LEAN_AND_MEAN
+
 #ifndef GPAC_MP4BOX_MINI
 
 #define GPAC_HAS_SSL
@@ -69,8 +71,12 @@ This section documents the base data types of GPAC.
 #define GPAC_HAS_LIBCAPTION
 #define GPAC_HAS_MPEGHDECODER
 #define GPAC_HAS_LIBCACA
+#define GPAC_HAS_CURL
+#define GPAC_HAS_FD
 
-/*IPv6 enabled - for win32, this is evaluated at compile time, !! do not uncomment !!*/
+#ifdef _WIN64
+//#define GPAC_HAS_NGTCP2
+#endif
 
 #define GPAC_MEMORY_TRACKING
 
@@ -162,6 +168,8 @@ This section documents the base data types of GPAC.
 #define GPAC_HAS_POLL
 #define GPAC_HAS_LIBCACA
 
+#define GPAC_HAS_NGTCP2
+
 #define GPAC_MEMORY_TRACKING
 
 #define GPAC_HAS_LIBCAPTION
@@ -202,6 +210,7 @@ This section documents the base data types of GPAC.
 #define GPAC_HAS_SSL
 #define GPAC_DISABLE_OGG
 #define GPAC_HAS_STRLCPY
+#define GPAC_HAS_STRLCAT
 #define GPAC_HAS_VTB
 #define GPAC_HAS_HTTP2
 #define GPAC_HAS_POLL
@@ -222,6 +231,9 @@ This section documents the base data types of GPAC.
 #else
 #error "Unknown target platform used with static configuration file"
 #endif
+
+
+#define GPAC_SCHED_DEFAULT "free"
 
 
 /*disables player */

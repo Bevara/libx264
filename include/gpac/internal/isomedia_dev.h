@@ -2,7 +2,7 @@
  *			GPAC - Multimedia Framework C SDK
  *
  *			Authors: Jean Le Feuvre
- *			Copyright (c) Telecom ParisTech 2000-2024
+ *			Copyright (c) Telecom ParisTech 2000-2026
  *					All rights reserved
  *
  *  This file is part of GPAC / ISO Media File Format sub-project
@@ -84,6 +84,8 @@ enum
 	GF_ISOM_BOX_TYPE_STRI	= GF_4CC( 's', 't', 'r', 'i' ),
 	GF_ISOM_BOX_TYPE_STRD	= GF_4CC( 's', 't', 'r', 'd' ),
 	GF_ISOM_BOX_TYPE_STSG	= GF_4CC( 's', 't', 's', 'g' ),
+	GF_ISOM_BOX_TYPE_EXTK	= GF_4CC( 'e', 'x', 't', 'k' ),
+	GF_ISOM_BOX_TYPE_EXTL	= GF_4CC( 'e', 'x', 't', 'l' ),
 
 	GF_ISOM_BOX_TYPE_UDTA	= GF_4CC( 'u', 'd', 't', 'a' ),
 	GF_ISOM_BOX_TYPE_VMHD	= GF_4CC( 'v', 'm', 'h', 'd' ),
@@ -121,6 +123,8 @@ enum
 	GF_ISOM_BOX_TYPE_AEIB	= GF_4CC( 'a', 'e', 'i', 'b' ),
 	GF_ISOM_BOX_TYPE_AKEY	= GF_4CC( 'a', 'k', 'e', 'y' ),
 	GF_ISOM_BOX_TYPE_FLXS	= GF_4CC( 'f', 'l', 'x', 's' ),
+
+	GF_ISOM_BOX_TYPE_SRAT	= GF_4CC( 's', 'r', 'a', 't' ),
 
 #ifndef	GPAC_DISABLE_ISOM_FRAGMENTS
 	/*Movie Fragments*/
@@ -204,16 +208,25 @@ enum
 	GF_ISOM_BOX_TYPE_AV1C = GF_4CC('a', 'v', '1', 'C'),
 	GF_ISOM_BOX_TYPE_AV01 = GF_4CC('a', 'v', '0', '1'),
 
+	/*AVS3 Video*/
+	GF_ISOM_BOX_TYPE_AV3C = GF_4CC('a', 'v', '3', 'c'),
+	GF_ISOM_BOX_TYPE_AVS3 = GF_4CC('a', 'v', 's', '3'),
+
 	/*WebM*/
 	GF_ISOM_BOX_TYPE_VPCC = GF_4CC('v', 'p', 'c', 'C'),
 	GF_ISOM_BOX_TYPE_VP08 = GF_4CC('v', 'p', '0', '8'),
 	GF_ISOM_BOX_TYPE_VP09 = GF_4CC('v', 'p', '0', '9'),
+	GF_ISOM_BOX_TYPE_VP10 = GF_4CC('v', 'p', '1', '0'),
 	GF_ISOM_BOX_TYPE_SMDM = GF_4CC('S', 'm', 'D', 'm'),
 	GF_ISOM_BOX_TYPE_COLL = GF_4CC('C', 'o', 'L', 'L'),
 
 	/*Opus*/
 	GF_ISOM_BOX_TYPE_OPUS = GF_4CC('O', 'p', 'u', 's'),
 	GF_ISOM_BOX_TYPE_DOPS = GF_4CC('d', 'O', 'p', 's'),
+
+	/*IAMF*/
+	GF_ISOM_BOX_TYPE_IAMF = GF_4CC('i', 'a', 'm', 'f'),
+	GF_ISOM_BOX_TYPE_IACB = GF_4CC('i', 'a', 'c', 'b'),
 
 	/*LASeR extension*/
 	GF_ISOM_BOX_TYPE_LSRC	= GF_4CC( 'l', 's', 'r', 'C' ),
@@ -235,6 +248,13 @@ enum
 	GF_ISOM_BOX_TYPE_LEVA   = GF_4CC( 'l', 'e', 'v', 'a' ),
 	GF_ISOM_BOX_TYPE_PCRB	= GF_4CC( 'p', 'c', 'r', 'b' ),
 	GF_ISOM_BOX_TYPE_EMSG	= GF_4CC( 'e', 'm', 's', 'g' ),
+	GF_ISOM_BOX_TYPE_RSOT	= GF_4CC( 'r', 's', 'o', 't' ),
+
+	/* 23001-18 EventMessage Track */
+	GF_ISOM_BOX_TYPE_EMIB	= GF_4CC( 'e', 'm', 'i', 'b' ),
+	GF_ISOM_BOX_TYPE_EMEB	= GF_4CC( 'e', 'm', 'e', 'b' ),
+	GF_ISOM_BOX_TYPE_EVTE	= GF_4CC( 'e', 'v', 't', 'e' ),
+	GF_ISOM_BOX_TYPE_SILB	= GF_4CC( 's', 'i', 'l', 'b' ),
 
 	/*3GPP text / MPEG-4 StreamingText*/
 	GF_ISOM_BOX_TYPE_FTAB	= GF_4CC( 'f', 't', 'a', 'b' ),
@@ -304,7 +324,6 @@ enum
 	GF_ISOM_BOX_TYPE_RTP	= GF_4CC( 'r', 't', 'p', ' ' ),
 	GF_ISOM_BOX_TYPE_SDP	= GF_4CC( 's', 'd', 'p', ' ' ),
 	GF_ISOM_BOX_TYPE_HINF	= GF_4CC( 'h', 'i', 'n', 'f' ),
-	GF_ISOM_BOX_TYPE_NAME	= GF_4CC( 'n', 'a', 'm', 'e' ),
 	GF_ISOM_BOX_TYPE_TRPY	= GF_4CC( 't', 'r', 'p', 'y' ),
 	GF_ISOM_BOX_TYPE_NUMP	= GF_4CC( 'n', 'u', 'm', 'p' ),
 	GF_ISOM_BOX_TYPE_TOTL	= GF_4CC( 't', 'o', 't', 'l' ),
@@ -365,6 +384,14 @@ enum
 	GF_ISOM_BOX_TYPE_TEXT	= GF_4CC( 't', 'e', 'x', 't' ),
 	GF_ISOM_HANDLER_TYPE_MDTA	= GF_4CC( 'm', 'd', 't', 'a' ),
 
+	/*3D HEVC extension */
+	GF_ISOM_BOX_TYPE_VEXU	 = GF_4CC( 'v', 'e', 'x', 'u' ),
+	GF_ISOM_BOX_TYPE_EYES	 = GF_4CC( 'e', 'y', 'e', 's' ),
+	GF_ISOM_BOX_TYPE_HERO	 = GF_4CC( 'h', 'e', 'r', 'o' ),
+
+	/*HDR video metadata */
+	GF_ISOM_BOX_TYPE_AMVE	 = GF_4CC( 'a', 'm', 'v', 'e' ),
+
 	/*OMA (P)DCF boxes*/
 	GF_ISOM_BOX_TYPE_OHDR	= GF_4CC( 'o', 'h', 'd', 'r' ),
 	GF_ISOM_BOX_TYPE_GRPI	= GF_4CC( 'g', 'r', 'p', 'i' ),
@@ -383,6 +410,8 @@ enum
 	GF_ISOM_BOX_TYPE_DAC3	= GF_4CC( 'd', 'a', 'c', '3' ),
 	GF_ISOM_BOX_TYPE_EC3	= GF_4CC( 'e', 'c', '-', '3' ),
 	GF_ISOM_BOX_TYPE_DEC3	= GF_4CC( 'd', 'e', 'c', '3' ),
+	GF_ISOM_BOX_TYPE_AC4	= GF_4CC( 'a', 'c', '-', '4' ),
+	GF_ISOM_BOX_TYPE_DAC4	= GF_4CC( 'd', 'a', 'c', '4' ),
 	GF_ISOM_BOX_TYPE_DVCC	= GF_4CC( 'd', 'v', 'c', 'C' ),
 	GF_ISOM_BOX_TYPE_DVVC	= GF_4CC( 'd', 'v', 'v', 'C' ),
 	GF_ISOM_BOX_TYPE_DVH1	= GF_4CC( 'd', 'v', 'h', '1' ),
@@ -435,6 +464,8 @@ enum
 	GF_ISOM_BOX_TYPE_IENC	= GF_4CC( 'i', 'e', 'n', 'c' ),
 	GF_ISOM_BOX_TYPE_IAUX 	= GF_4CC('i', 'a', 'u', 'x'),
 	GF_ISOM_BOX_TYPE_ILCE   = GF_4CC( 'i', 'l', 'c', 'e' ),
+	GF_ISOM_BOX_TYPE_TXLO   = GF_4CC( 't', 'x', 'l', 'o' ),
+	GF_ISOM_BOX_TYPE_FNCH   = GF_4CC( 'f', 'n', 'c', 'h' ),
 
 	/* MIAF Boxes */
 	GF_ISOM_BOX_TYPE_CLLI	= GF_4CC('c', 'l', 'l', 'i'),
@@ -475,7 +506,12 @@ enum
 	GF_ISOM_BOX_TYPE_IHDR	= GF_4CC('i','h','d','r'),
 	GF_ISOM_BOX_TYPE_JP  	= GF_4CC('j','P',' ',' '),
 	GF_ISOM_BOX_TYPE_JP2H	= GF_4CC('j','p','2','h'),
+	GF_ISOM_BOX_TYPE_JP2P	= GF_4CC('j','p','2','p'),
+	GF_ISOM_BOX_TYPE_JSUB	= GF_4CC('j','s','u','b'),
+	GF_ISOM_BOX_TYPE_ORFO	= GF_4CC('o','r','f','o'),
 	GF_ISOM_BOX_TYPE_JP2K	= GF_4CC('j','p','2','k'),
+	GF_ISOM_BOX_TYPE_J2KH	= GF_4CC('j','2','k','H'),
+	GF_ISOM_BOX_TYPE_CDEF	= GF_4CC('c','d','e','f'),
 
 	GF_ISOM_BOX_TYPE_JPEG	= GF_4CC('j','p','e','g'),
 	GF_ISOM_BOX_TYPE_PNG 	= GF_4CC('p','n','g',' '),
@@ -496,6 +532,7 @@ enum
 	GF_QT_BOX_TYPE_FRMA = GF_4CC('f','r','m','a'),
 	GF_QT_BOX_TYPE_TMCD = GF_4CC('t','m','c','d'),
 	GF_QT_BOX_TYPE_NAME = GF_4CC('n','a','m','e'),
+	GF_QT_BOX_TYPE_MEAN = GF_4CC('m','e','a','n'),
 	GF_QT_BOX_TYPE_TCMI = GF_4CC('t','c','m','i'),
 	GF_QT_BOX_TYPE_FIEL = GF_4CC('f','i','e','l'),
 	GF_QT_BOX_TYPE_GAMA = GF_4CC('g','a','m','a'),
@@ -565,6 +602,16 @@ enum
 	GF_ISOM_BOX_TYPE_GDAT	= GF_4CC( 'g', 'd', 'a', 't' ),
 
 	GF_ISOM_BOX_TYPE_KEYS = GF_4CC( 'k', 'e', 'y', 's' ),
+
+
+	GF_GPAC_BOX_TYPE_SREF = GF_4CC( 'G', 'P', 'S', 'R' ),
+	GF_ISOM_BOX_TYPE_CDRF = GF_4CC( 'c', 'd', 'r', 'f' ),
+
+	GF_ISOM_BOX_TYPE_CMOV	= GF_4CC( '!', 'm', 'o', 'v' ),
+	GF_ISOM_BOX_TYPE_CMOF	= GF_4CC( '!', 'm', 'o', 'f' ),
+	GF_ISOM_BOX_TYPE_CSIX	= GF_4CC( '!', 's', 'i', 'x' ),
+	GF_ISOM_BOX_TYPE_CSSX	= GF_4CC( '!', 's', 's', 'x' ),
+
 };
 
 enum
@@ -586,6 +633,8 @@ enum
 #define GF_ISOM_BS_COOKIE_QT_CONV		(1<<2)
 #define GF_ISOM_BS_COOKIE_CLONE_TRACK	(1<<3)
 #define GF_ISOM_BS_COOKIE_IN_UDTA		(1<<4)
+#define GF_ISOM_BS_COOKIE_NO_DECOMP		(1<<5)
+#define GF_ISOM_BS_COOKIE_NO_MABR_PATCH	(1<<6)
 
 
 #ifndef GPAC_DISABLE_ISOM
@@ -598,7 +647,10 @@ enum
 //internal flags (up to 16)
 //if flag is set, position checking of child boxes is ignored
 #define GF_ISOM_ORDER_FREEZE 1
+//if flag is set, box uses deflate compression
 #define GF_ISOM_BOX_COMPRESSED 2
+//if flag is set, box dump will skip size info
+#define GF_ISOM_DUMP_SKIP_SIZE 4
 
 	/*the default size is 64, cause we need to handle large boxes...
 
@@ -685,6 +737,7 @@ GF_Err gf_isom_box_parse(GF_Box **outBox, GF_BitStream *bs);
 GF_Err gf_isom_box_array_read(GF_Box *s, GF_BitStream *bs);
 
 GF_Err gf_isom_box_parse_ex(GF_Box **outBox, GF_BitStream *bs, u32 parent_type, Bool is_root_box, u64 parent_size);
+GF_Err gf_isom_parse_root_box(GF_Box **outBox, GF_BitStream *bs, u32 *boxType, u64 *bytesExpected, Bool progressive_mode);
 
 //writes box header - shall be called at the beginning of each xxxx_Write function
 //this function is not factorized in order to let box serializer modify box type before writing
@@ -692,6 +745,9 @@ GF_Err gf_isom_box_write_header(GF_Box *ptr, GF_BitStream *bs);
 
 //writes box header then version+flags
 GF_Err gf_isom_full_box_write(GF_Box *s, GF_BitStream *bs);
+
+//return wether a box is a fullbox based on max_version_plus_one
+Bool gf_isom_box_is_full_box(GF_Box *s);
 
 void gf_isom_box_array_reset(GF_List *boxlist);
 void gf_isom_box_array_del(GF_List *child_boxes);
@@ -884,7 +940,7 @@ typedef struct
 	GF_ISOFile *mov;
 
 	Bool mvex_after_traks;
-	Bool has_cmvd;
+	u32 has_cmvd;
 	//for compressed mov, stores the difference between compressed and uncompressed payload
 	s32 compressed_diff;
 	//for compressed mov, indicates the file offset of the moov box start
@@ -927,6 +983,16 @@ typedef struct {
 	u32 track_group_id;
 } GF_TrackGroupTypeBox;
 
+typedef struct {
+	GF_ISOM_FULL_BOX
+	u32 referenced_track_ID;
+	u32 referenced_handler_type;
+	u32 media_timescale;
+	char *location;
+} GF_ExternalTrackLocationBox;
+
+
+
 typedef struct
 {
 	GF_ISOM_BOX
@@ -938,9 +1004,11 @@ typedef struct
 	/*meta box if any*/
 	struct __tag_meta_box *meta;
 	GF_TrackGroupBox *groups;
+	/*external track location*/
+	GF_ExternalTrackLocationBox *extl;
 
 	GF_Box *Aperture;
-	
+
 	GF_MovieBox *moov;
 	/*private for media padding*/
 	u32 padding_bytes;
@@ -959,7 +1027,7 @@ typedef struct
 	u32 pack_num_samples;
 
 	u64 magic;
-	u32 index;
+	u32 mux_index;
 	u32 nb_base_refs;
 
 	u8 *(*sample_alloc_cbk)(u32 size, void *cbk);
@@ -1181,7 +1249,7 @@ typedef struct
 } GF_TimeToSampleBox;
 
 
-/*TO CHECK - it could be reasonnable to only use 16bits for both count and offset*/
+/*TO CHECK - it could be reasonable to only use 16bits for both count and offset*/
 typedef struct
 {
 	u32 sampleCount;
@@ -1204,6 +1272,7 @@ typedef struct
 	u32 r_FirstSampleInEntry;
 
 	s32 max_cts_delta;
+	s32 min_neg_cts_offset;
 	//u32 sample_num_max_cts_delta;
 } GF_CompositionOffsetBox;
 
@@ -1328,7 +1397,7 @@ typedef struct
 	u32 avgBitrate;
 } GF_BitRateBox;
 
-GF_BitRateBox *gf_isom_sample_entry_get_bitrate(GF_SampleEntryBox *ent, Bool create);
+GF_BitRateBox *gf_isom_sample_entry_get_bitrate_box(GF_SampleEntryBox *ent, Bool create);
 
 typedef struct
 {
@@ -1507,6 +1576,14 @@ typedef struct
 	GF_VPConfig *config;
 } GF_VPConfigurationBox;
 
+
+typedef struct
+{
+	GF_ISOM_BOX
+	GF_AVS3VConfig *config;
+} GF_AVS3VConfigurationBox;
+
+
 typedef struct
 {
 	GF_ISOM_FULL_BOX
@@ -1561,9 +1638,37 @@ typedef struct
 typedef struct
 {
 	GF_ISOM_BOX
+	u32 signature;
+} GF_JP2SignatureBox;
+
+typedef struct
+{
+	GF_ISOM_BOX
 	GF_J2KImageHeaderBox *ihdr;
 	GF_ColourInformationBox *colr;
 } GF_J2KHeaderBox;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+	GF_List *compatible_brands;
+} GF_JP2ProfileBox;
+
+typedef struct
+{
+	GF_ISOM_BOX
+	u8 horizontal_sub;
+	u8 vertical_sub;
+	u8 horizontal_offset;
+	u8 vertical_offset;
+} GF_JP2SubSamplingBox;
+
+typedef struct
+{
+	GF_ISOM_BOX
+	u8 original_fieldcount;
+	u8 original_fieldorder;
+} GF_JP2OriginalFormatBox;
 
 typedef struct __full_video_sample_entry
 {
@@ -1585,6 +1690,8 @@ typedef struct __full_video_sample_entry
 	GF_AV1ConfigurationBox *av1_config;
 	/*vp8-9 extension*/
 	GF_VPConfigurationBox *vp_config;
+	/*avs3 video extension*/
+	GF_AVS3VConfigurationBox *avs3v_config;
 	/*jp2k extension*/
 	GF_J2KHeaderBox *jp2h;
 	/*dolbyvision extension*/
@@ -1658,6 +1765,17 @@ typedef struct
 	GF_AC3Config cfg;
 } GF_AC3ConfigBox;
 
+typedef struct
+{
+	GF_ISOM_BOX
+	GF_AC4Config cfg;
+} GF_AC4ConfigBox;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+	u32 sampling_rate;
+} GF_SamplingRateBox;
 
 
 typedef struct
@@ -1721,6 +1839,13 @@ typedef struct
 typedef struct
 {
 	GF_ISOM_BOX
+	GF_IAConfig *cfg;
+} GF_IAConfigurationBox;
+
+
+typedef struct
+{
+	GF_ISOM_BOX
 	GF_DTSConfig cfg;
 } GF_DTSSpecificBox;
 
@@ -1771,6 +1896,9 @@ typedef struct __full_audio_sample_entry
 	//for AC3/EC3 audio
 	GF_AC3ConfigBox *cfg_ac3;
 
+	//for AC4 audio
+	GF_AC4ConfigBox *cfg_ac4;
+
 	//for AC3/EC3 audio
 	GF_TrueHDConfigBox *cfg_mlp;
 
@@ -1782,6 +1910,9 @@ typedef struct __full_audio_sample_entry
 
 	//for FLAC
 	GF_FLACConfigBox *cfg_flac;
+
+	//for IAMF
+	GF_IAConfigurationBox *cfg_iamf;
 
 	//for generic audio sample entry
 	//box type as specified in the file (not this box's type!!)
@@ -2028,16 +2159,16 @@ u32  gf_isom_sample_get_subsample_entry(GF_ISOFile *movie, u32 track, u32 sample
 GF_Err gf_isom_add_subsample_info(GF_SubSampleInformationBox *sub_samples, u32 sampleNumber, u32 subSampleSize, u8 priority, u32 reserved, Bool discardable);
 #endif
 
-/* Use to relate the composition and decoding timeline when signed composition is used*/
+/* Use to relate the composition and decoding timeline when signed composition is used */
 typedef struct
 {
 	GF_ISOM_FULL_BOX
 
-	s32 compositionToDTSShift;
-	s32 leastDecodeToDisplayDelta;
-	s32 greatestDecodeToDisplayDelta;
-	s32 compositionStartTime;
-	s32 compositionEndTime;
+	s64 compositionToDTSShift;
+	s64 leastDecodeToDisplayDelta;
+	s64 greatestDecodeToDisplayDelta;
+	s64 compositionStartTime;
+	s64 compositionEndTime;
 } GF_CompositionToDecodeBox;
 
 typedef struct
@@ -2086,6 +2217,7 @@ typedef struct
 	u64 moof_start;
 	u64 mdat_end;
 	u64 first_dts;
+	u8 is_predicted_offset;
 } GF_TrafMapEntry;
 
 typedef struct
@@ -2095,6 +2227,25 @@ typedef struct
 	//read cache
 	u32 r_cur_sample, r_cur_idx;
 } GF_TrafToSampleMap;
+
+void gf_isom_push_mdat_end(GF_ISOFile *mov, u64 mdat_end, Bool is_pred);
+
+typedef struct
+{
+	u32 sampleID;
+	u32 nb_refs;
+	u32 *sample_refs;
+} GF_SampleRefEntry;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+	GF_List *entries;
+	u32 id_shift;
+
+	//for cdrf
+	u32 cdrf_entries, cdrf_cache_size;
+} GF_SampleReferences;
 
 typedef struct
 {
@@ -2112,6 +2263,7 @@ typedef struct
 	GF_DegradationPriorityBox *DegradationPriority;
 	GF_PaddingBitsBox *PaddingBits;
 	GF_SampleDependencyTypeBox *SampleDep;
+	GF_SampleReferences *SampleRefs;
 
 	GF_TrafToSampleMap *traf_map;
 
@@ -2208,6 +2360,9 @@ typedef struct
 	u32 group_id;
 	u32 entity_id_count;
 	u32 *entity_ids;
+	u8 *data;
+	u32 data_len;
+
 } GF_EntityToGroupTypeBox;
 
 typedef struct
@@ -2627,7 +2782,7 @@ typedef struct
 
 	Bool cannot_use_default;
 	GF_ISOTrackID inherit_from_traf_id;
-	
+
 	GF_TrackFragmentRandomAccessBox *tfra;
 } GF_TrackExtendsBox;
 
@@ -2663,6 +2818,7 @@ typedef struct
 	//temp storage of prft box
 	GF_ISOTrackID reference_track_ID;
 	u64 ntp, timestamp;
+	u32 prft_at_mux;
 
 	//emsg to inject before moof, not part of the moof hierarchy !
 	GF_List *emsgs;
@@ -2707,6 +2863,14 @@ typedef struct
 	u64 baseMediaDecodeTime;
 } GF_TFBaseMediaDecodeTimeBox;
 
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+	u32 original_duration;
+	u32 elapsed_duration;
+} GF_TFOriginalDurationBox;
+
 typedef struct
 {
 	GF_ISOM_BOX
@@ -2715,6 +2879,7 @@ typedef struct
 	/*keep a pointer to default flags*/
 	GF_TrackExtendsBox *trex;
 	GF_SampleDependencyTypeBox *sdtp;
+	GF_SampleReferences *SampleRefs;
 
 //	GF_SubSampleInformationBox *subs;
 	GF_List *sub_samples;
@@ -2734,6 +2899,7 @@ typedef struct
 	/*when data caching is on*/
 	u32 DataCache;
 	GF_TFBaseMediaDecodeTimeBox *tfdt;
+	GF_TFOriginalDurationBox *rsot;
 
 	u64 moof_start_in_bs;
 #ifdef GF_ENABLE_CTRN
@@ -3049,7 +3215,7 @@ typedef struct
 
 typedef struct
 {
-	GF_ISOM_BOX
+	GF_ISOM_FULL_BOX
 	char *string;
 } GF_NameBox;
 
@@ -3088,7 +3254,7 @@ typedef struct
 typedef struct
 {
 	GF_ISOM_FULL_BOX
-	u32 reserved;
+	u32 locale;
 	u8 *data;
 	u32 dataSize;
 	Bool qt_style;
@@ -3098,12 +3264,50 @@ typedef struct
 {
 	GF_ISOM_BOX
 	GF_DataBox *data;
+
+	GF_NameBox *mean;
+	GF_NameBox *name;
 } GF_ListItemBox;
 
 typedef struct
 {
 	GF_ISOM_BOX
 } GF_ItemListBox;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+} GF_VideoExtendedUsageBox;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+
+	// mandatory Stereo view information 'stri' box
+	struct GF_StereoViewInformationBox
+	{
+		GF_ISOM_FULL_BOX
+		u8 reserved;
+		u8 eye_views_reversed;
+		u8 has_additional_views;
+		u8 has_right_eye_view;
+		u8 has_left_eye_view;
+	} stri;
+} GF_StereoViewBox;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+	u8 hero_eye_indicator;
+} GF_HeroStereoEyeDescriptionBox;
+
+typedef struct
+{
+	GF_ISOM_BOX
+	u32 ambient_illuminance;
+	u16 ambient_light_x;
+	u16 ambient_light_y;
+} GF_AmbientViewingEnvBox;
 
 /*DECE*/
 typedef struct
@@ -3257,18 +3461,43 @@ typedef struct __pcrInfo_box
 } GF_PcrInfoBox;
 
 
+/*used for both 'emsg' and 'emib' boxes*/
 typedef struct
 {
 	GF_ISOM_FULL_BOX
 	char *scheme_id_uri;
 	char *value;
 	u32 timescale;
-	u64 presentation_time_delta;
+	s64 presentation_time_delta;
 	u32 event_duration;
 	u32 event_id;
 	u8 *message_data;
 	u32 message_data_size;
 } GF_EventMessageBox;
+
+typedef struct
+{
+	char *scheme_id_uri;
+	char *value;
+	u8 reserved : 7;
+	u8 atleast_once_flag : 1;
+} GF_SchemeIdListBoxEntry;
+
+typedef struct
+{
+	GF_ISOM_FULL_BOX
+	u32 number_of_schemes;
+	GF_List *schemes; /*list of GF_SchemeIdListBoxEntry*/
+	u8 reserved : 7;
+	u8 other_schemes_flag : 1;
+} GF_SchemeIdListBox;
+
+typedef struct
+{
+	GF_ISOM_SAMPLE_ENTRY_FIELDS
+	GF_BitRateBox *btrt;
+	GF_SchemeIdListBox *silb;
+} GF_EventMessageSampleEntryBox;
 
 
 #ifndef GPAC_DISABLE_ISOM_ADOBE
@@ -3418,6 +3647,12 @@ typedef struct
 	u32 length;
 	u8 *data;
 } GF_DefaultSampleGroupDescriptionEntry;
+
+/*AV1 Switching Entry - Switching Frames*/
+typedef struct
+{
+	int unused; // C requires that a struct or union has at least one member
+} GF_AV1SwitchingEntry;
 
 /*VisualRandomAccessEntry - 'rap ' type*/
 typedef struct
@@ -3850,6 +4085,29 @@ typedef struct {
 	u32 aux_info_parameter;
 } GF_AuxiliaryInfoPropertyBox;
 
+
+typedef struct {
+	GF_ISOM_FULL_BOX
+	char* font_family;
+	char* font_style;
+	char* font_weight;
+} GF_FontCharacteristicsPropertyBox;
+
+
+typedef struct {
+	GF_ISOM_FULL_BOX
+	u32 reference_width;
+	u32 reference_height;
+	s32 x;
+	s32 y;
+	u32 width;
+	u32 height;
+	s16 font_size;
+	char* direction;
+	char* writing_mode;
+} GF_TextLayoutPropertyBox;
+
+
 typedef struct {
 	GF_ISOM_FULL_BOX
 
@@ -4007,9 +4265,10 @@ enum
 
 /*this is the DataHandler structure each data handler has its own bitstream*/
 #define GF_ISOM_BASE_DATA_HANDLER	\
-	u8	type;		\
 	u64	curPos;		\
-	u8	mode;		\
+	u8 type;		\
+	u8 mode;		\
+	u8 use_blob;		\
 	GF_BitStream *bs;\
 	u64 last_read_offset;\
 	char *szName;
@@ -4048,12 +4307,12 @@ GF_Err gf_isom_datamap_new(const char *location, const char *parentPath, u8 mode
 void gf_isom_datamap_del(GF_DataMap *ptr);
 GF_Err gf_isom_datamap_open(GF_MediaBox *minf, u32 dataRefIndex, u8 Edit);
 void gf_isom_datamap_close(GF_MediaInformationBox *minf);
-u32 gf_isom_datamap_get_data(GF_DataMap *map, u8 *buffer, u32 bufferLength, u64 Offset);
+u32 gf_isom_datamap_get_data(GF_DataMap *map, u8 *buffer, u32 bufferLength, u64 Offset, GF_BlobRangeStatus *range_status);
 
 /*File-based data map*/
 GF_DataMap *gf_isom_fdm_new(const char *sPath, u8 mode);
 void gf_isom_fdm_del(GF_FileDataMap *ptr);
-u32 gf_isom_fdm_get_data(GF_FileDataMap *ptr, u8 *buffer, u32 bufferLength, u64 fileOffset);
+u32 gf_isom_fdm_get_data(GF_FileDataMap *ptr, u8 *buffer, u32 bufferLength, u64 fileOffset, GF_BlobRangeStatus *range_status);
 
 #ifndef GPAC_DISABLE_ISOM_WRITE
 GF_DataMap *gf_isom_fdm_new_temp(const char *sTempPath);
@@ -4145,6 +4404,9 @@ struct __tag_isom {
 	s64 read_byte_offset;
 	u64 bytes_removed;
 
+	u32 tracks_use_mux_index;
+	Bool auto_reorder_tracks;
+
 #ifndef GPAC_DISABLE_ISOM_WRITE
 	GF_ISOCompressMode compress_mode;
 	u32 compress_flags;
@@ -4153,6 +4415,8 @@ struct __tag_isom {
 
 	void (*progress_cbk)(void *udta, u64 nb_done, u64 nb_total);
 	void *progress_cbk_udta;
+
+	char *override_dref_url;
 
 	/*in WRITE mode, this is the current MDAT where data is written*/
 	/*in READ mode this is the last valid file position before a gf_isom_box_read failed*/
@@ -4247,7 +4511,7 @@ void gf_isom_set_last_error(GF_ISOFile *the_file, GF_Err error);
 GF_Err gf_isom_parse_movie_boxes(GF_ISOFile *mov, u32 *boxType, u64 *bytesMissing, Bool progressive_mode);
 GF_ISOFile *gf_isom_new_movie();
 /*Movie and Track access functions*/
-GF_TrackBox *gf_isom_get_track_from_file(GF_ISOFile *the_file, u32 trackNumber);
+GF_TrackBox *gf_isom_get_track_box(GF_ISOFile *the_file, u32 trackNumber);
 GF_TrackBox *gf_isom_get_track(GF_MovieBox *moov, u32 trackNumber);
 GF_TrackBox *gf_isom_get_track_from_id(GF_MovieBox *moov, GF_ISOTrackID trackID);
 GF_TrackBox *gf_isom_get_track_from_original_id(GF_MovieBox *moov, u32 originalID, u32 originalFile);
@@ -4282,6 +4546,8 @@ GF_Err Media_FindSyncSample(GF_SampleTableBox *stbl, u32 searchFromTime, u32 *sa
 GF_Err Media_RewriteODFrame(GF_MediaBox *mdia, GF_ISOSample *sample);
 GF_Err Media_FindDataRef(GF_DataReferenceBox *dref, char *URLname, char *URNname, u32 *dataRefIndex);
 Bool Media_IsSelfContained(GF_MediaBox *mdia, u32 StreamDescIndex);
+
+Bool gf_isom_datamap_top_level_box_avail(GF_DataMap *map);
 
 typedef enum
 {
@@ -4337,7 +4603,6 @@ GF_Err gf_isom_set_sample_group_description_internal(GF_ISOFile *movie, u32 trac
 GF_Err isom_on_block_out(void *cbk, u8 *data, u32 block_size);
 
 GF_Err FlushCaptureMode(GF_ISOFile *movie);
-GF_Err CanAccessMovie(GF_ISOFile *movie, GF_ISOOpenMode Mode);
 GF_ISOFile *gf_isom_create_movie(const char *fileName, GF_ISOOpenMode OpenMode, const char *tmp_dir);
 GF_Err gf_isom_insert_moov(GF_ISOFile *file);
 
@@ -4411,7 +4676,7 @@ GF_Err gf_isom_flush_sidx(GF_ISOFile *movie, u32 sidx_max_size, Bool force_v1);
 #endif /*GPAC_DISABLE_ISOM_WRITE*/
 
 Bool gf_isom_is_identical_sgpd(void *ptr1, void *ptr2, u32 grouping_type);
-void sgpd_del_entry(u32 grouping_type, void *entry);
+void sgpd_del_entry(u32 grouping_type, void *entry, Bool is_opaque);
 
 /*return type is either GF_DefaultSampleGroupDescriptionEntry if opaque sample group, or the structure associated with the grouping type*/
 void *gf_isom_get_sample_group_info_entry(GF_ISOFile *the_file, GF_TrackBox *trak, u32 grouping_type, u32 sample_description_index, u32 *default_index, GF_SampleGroupDescriptionBox **out_sgdp);
@@ -4432,6 +4697,7 @@ GF_Err mvex_on_child_box(GF_Box *ptr, GF_Box *a, Bool is_rem);
 GF_Err stsd_on_child_box(GF_Box *ptr, GF_Box *a, Bool is_rem);
 GF_Err hnti_on_child_box(GF_Box *hnti, GF_Box *a, Bool is_rem);
 GF_Err udta_on_child_box(GF_Box *ptr, GF_Box *a, Bool is_rem);
+GF_Err udta_on_child_box_ex(GF_Box *s, GF_Box *a, Bool is_rem, Bool rem_same_type);
 GF_Err edts_on_child_box(GF_Box *s, GF_Box *a, Bool is_rem);
 GF_Err stdp_box_read(GF_Box *s, GF_BitStream *bs);
 GF_Err stbl_on_child_box(GF_Box *ptr, GF_Box *a, Bool is_rem);
@@ -4440,6 +4706,7 @@ GF_Err dinf_on_child_box(GF_Box *s, GF_Box *a, Bool is_rem);
 GF_Err minf_on_child_box(GF_Box *s, GF_Box *a, Bool is_rem);
 GF_Err mdia_on_child_box(GF_Box *s, GF_Box *a, Bool is_rem);
 GF_Err traf_on_child_box(GF_Box *s, GF_Box *a, Bool is_rem);
+GF_Err ilst_item_on_child_box(GF_Box *s, GF_Box *a, Bool is_rem);
 
 /*rewrites avcC based on the given esd - this destroys the esd*/
 GF_Err AVC_HEVC_UpdateESD(GF_MPEGVisualSampleEntryBox *avc, GF_ESD *esd);
@@ -4463,9 +4730,6 @@ GF_Err gf_isom_cenc_merge_saiz_saio(GF_SampleEncryptionBox *senc, GF_SampleTable
 void gf_isom_parse_trif_info(const u8 *data, u32 size, u32 *id, u32 *independent, Bool *full_picture, u32 *x, u32 *y, u32 *w, u32 *h);
 
 Bool gf_isom_is_encrypted_entry(u32 entryType);
-
-//too export in constants
-Bool gf_cenc_validate_key_info(const u8 *key_info, u32 key_info_size);
 
 GF_Err gf_isom_add_sample_aux_info_internal(GF_TrackBox *trak, void *_traf, u32 sampleNumber, u32 aux_type, u32 aux_info, u8 *data, u32 size);
 
@@ -4747,7 +5011,7 @@ GF_GenericSubtitleSample *gf_isom_parse_generic_subtitle_sample_from_data(u8 *da
 /*do not throw fatal errors if boxes are duplicated, just warn and remove extra ones*/
 #define ERROR_ON_DUPLICATED_BOX(__abox, __parent) {	\
 		char __ptype[GF_4CC_MSIZE];\
-		strcpy(__ptype, gf_4cc_to_str(__parent->type) );\
+		gf_strcpy(__ptype, gf_4cc_to_str(__parent->type) );\
 		GF_LOG(GF_LOG_WARNING, GF_LOG_CONTAINER, ("[iso file] extra box %s found in %s, deleting\n", gf_4cc_to_str(__abox->type), __ptype)); \
 		gf_isom_box_del_parent(& (__parent->child_boxes), __abox);\
 		return GF_OK;\
@@ -4781,7 +5045,8 @@ Bool gf_isom_box_equal(GF_Box *a, GF_Box *b);
 GF_Box *gf_isom_clone_config_box(GF_Box *box);
 
 GF_Err gf_isom_box_dump(void *ptr, FILE * trace);
-GF_Err gf_isom_box_array_dump(GF_List *list, FILE * trace);
+GF_Err gf_isom_box_dump_ex(void *ptr, FILE * trace, Bool subtree_root);
+GF_Err gf_isom_box_array_dump(GF_List *list, FILE * trace, u16 parent_internal_flags);
 
 void gf_isom_registry_disable(u32 boxCode, Bool disable);
 
@@ -4798,9 +5063,8 @@ GF_Box *gf_isom_create_meta_extensions(GF_ISOFile *mov, u32 meta_type);
 
 
 #ifndef GPAC_DISABLE_ISOM_DUMP
-GF_Err gf_isom_box_dump_ex(void *ptr, FILE * trace, u32 box_4cc);
 GF_Err gf_isom_box_dump_start(GF_Box *a, const char *name, FILE * trace);
-GF_Err gf_isom_box_dump_start_ex(GF_Box *a, const char *name, FILE * trace, Bool force_version);
+GF_Err gf_isom_box_dump_start_ex(GF_Box *a, const char *name, FILE * trace, Bool force_version, const char *spec, const char *container);
 void gf_isom_box_dump_done(const char *name, GF_Box *ptr, FILE *trace);
 Bool gf_isom_box_is_file_level(GF_Box *s);
 #endif
@@ -4820,4 +5084,3 @@ GF_Err MergeTrack(GF_TrackBox *trak, GF_TrackFragmentBox *traf, GF_MovieFragment
 #endif
 
 #endif //_GF_ISOMEDIA_DEV_H_
-

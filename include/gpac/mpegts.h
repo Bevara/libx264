@@ -2,7 +2,7 @@
  *			GPAC - Multimedia Framework C SDK
  *
  *			Authors: Jean Le Feuvre, Cyril Concolato, Romain Bouqueau
- *			Copyright (c) Telecom ParisTech 2006-2023
+ *			Copyright (c) Telecom ParisTech 2006-2025
  *
  *  This file is part of GPAC / MPEG2-TS sub-project
  *
@@ -55,6 +55,7 @@ extern "C" {
 /*! metadata types for GF_M2TS_METADATA_POINTER_DESCRIPTOR*/
 enum {
 	GF_M2TS_META_ID3 	= GF_4CC('I','D','3',' '),
+	GF_M2TS_META_KLVA 	= GF_4CC('K','L','V','A'),
 };
 
 
@@ -74,7 +75,8 @@ enum
 	GF_M2TS_ISO_639_LANGUAGE_DESCRIPTOR						= 0x0A,
 	GF_M2TS_DVB_IP_MAC_PLATFORM_NAME_DESCRIPTOR				= 0x0C,
 	GF_M2TS_DVB_IP_MAC_PLATFORM_PROVIDER_NAME_DESCRIPTOR	= 0x0D,
-	GF_M2TS_DVB_TARGET_IP_SLASH_DESCRIPTOR			= 0x0F,
+	GF_M2TS_MAX_BITRATE_DESCRIPTOR	= 0x0E,
+	GF_M2TS_PRIVATE_DATA_INDICATOR_DESCRIPTOR			= 0x0F,
 	/* ... */
 	GF_M2TS_DVB_STREAM_LOCATION_DESCRIPTOR        =0x13,
 	/* ... */
@@ -140,7 +142,9 @@ enum
 	GF_M2TS_DVB_EAC3_DESCRIPTOR				= 0x7A,
 	GF_M2TS_DVB_LOGICAL_CHANNEL_DESCRIPTOR = 0x83,
 
-	GF_M2TS_DOLBY_VISION_DESCRIPTOR = 0xB0
+	GF_M2TS_DOLBY_VISION_DESCRIPTOR = 0xB0,
+
+	GF_M2TS_DVB_EXT_DESCRIPTOR = 0x7f
 };
 
 /*! Reserved PID values */
@@ -213,6 +217,7 @@ enum {
 	GF_M2TS_TABLE_ID_DIT			= 0x7E,
 	GF_M2TS_TABLE_ID_SIT			= 0x7F, /* max size for section 4096 */
 	/* 0x80 - 0xfe reserved */
+	GF_M2TS_TABLE_ID_SCTE35_SPLICE_INFO	= 0xFC,
 	/* 0xff reserved */
 };
 
@@ -277,23 +282,33 @@ typedef enum
 	GF_M2TS_HLS_AAC_CRYPT		= 0xcf,
 	GF_M2TS_HLS_AVC_CRYPT		= 0xdb,
 
+	GF_M2TS_VIDEO_AVS2          = 0xD2,
+	GF_M2TS_AUDIO_AVS2          = 0xD3,
+	GF_M2TS_VIDEO_AVS3          = 0xD4,
+	GF_M2TS_AUDIO_AVS3          = 0xD5,
+
 	/*the rest is internal use*/
 
-	GF_M2TS_VIDEO_VC1				= 0xEA,
-	GF_M2TS_VIDEO_DCII				= 0x80,
-	GF_M2TS_AUDIO_AC3				= 0x81,
-	GF_M2TS_AUDIO_DTS				= 0x82,
-	GF_M2TS_AUDIO_TRUEHD			= 0x83,
-	GF_M2TS_AUDIO_EC3				= 0x84,
-	GF_M2TS_MPE_SECTIONS            = 0x90,
-	GF_M2TS_SUBTITLE_DVB			= 0x100,
-	GF_M2TS_AUDIO_OPUS				= 0x101,
-	GF_M2TS_VIDEO_AV1				= 0x102,
+	GF_M2TS_VIDEO_VC1					= 0xEA,
+	GF_M2TS_VIDEO_DCII					= 0x80,
+	GF_M2TS_AUDIO_AC3					= 0x81,
+	GF_M2TS_AUDIO_DTS					= 0x82,
+	GF_M2TS_AUDIO_TRUEHD				= 0x83,
+	GF_M2TS_AUDIO_EC3					= 0x84,
+	GF_M2TS_SCTE35_SPLICE_INFO_SECTIONS	= 0x86,
+	GF_M2TS_MPE_SECTIONS	            = 0x90,
+	GF_M2TS_SUBTITLE_DVB				= 0x100,
+	GF_M2TS_AUDIO_OPUS					= 0x101,
+	GF_M2TS_VIDEO_AV1					= 0x102,
+	GF_M2TS_AUDIO_AC4					= 0x103,
 
-	GF_M2TS_DVB_TELETEXT			= 0x152,
-	GF_M2TS_DVB_VBI					= 0x153,
-	GF_M2TS_DVB_SUBTITLE			= 0x154,
-	GF_M2TS_METADATA_ID3_HLS		= 0x155,
+	GF_M2TS_DVB_TELETEXT				= 0x152,
+	GF_M2TS_DVB_VBI						= 0x153,
+	GF_M2TS_DVB_SUBTITLE				= 0x154,
+	GF_M2TS_METADATA_ID3_HLS			= 0x155,
+	GF_M2TS_METADATA_ID3_KLVA			= 0x156,
+	GF_M2TS_METADATA_SRT				= 0x157,
+	GF_M2TS_METADATA_TEXT				= 0x158,
 
 } GF_M2TSStreamType;
 
@@ -301,18 +316,24 @@ typedef enum
 /*! MPEG-2 TS Registration codes types*/
 enum
 {
-	GF_M2TS_RA_STREAM_AC3	= GF_4CC('A','C','-','3'),
-	GF_M2TS_RA_STREAM_EAC3	= GF_4CC('E','A','C','3'),
-	GF_M2TS_RA_STREAM_VC1	= GF_4CC('V','C','-','1'),
-	GF_M2TS_RA_STREAM_HEVC	= GF_4CC('H','E','V','C'),
-	GF_M2TS_RA_STREAM_DTS1	= GF_4CC('D','T','S','1'),
-	GF_M2TS_RA_STREAM_DTS2	= GF_4CC('D','T','S','2'),
-	GF_M2TS_RA_STREAM_DTS3	= GF_4CC('D','T','S','3'),
-	GF_M2TS_RA_STREAM_OPUS	= GF_4CC('O','p','u','s'),
-	GF_M2TS_RA_STREAM_DOVI	= GF_4CC('D','O','V','I'),
-	GF_M2TS_RA_STREAM_AV1	= GF_4CC('A','V','0','1'),
+	GF_M2TS_RA_STREAM_AC3		= GF_4CC('A','C','-','3'),
+	GF_M2TS_RA_STREAM_EAC3		= GF_4CC('E','A','C','3'),
+	GF_M2TS_RA_STREAM_VC1		= GF_4CC('V','C','-','1'),
+	GF_M2TS_RA_STREAM_HEVC		= GF_4CC('H','E','V','C'),
+	GF_M2TS_RA_STREAM_DTS1		= GF_4CC('D','T','S','1'),
+	GF_M2TS_RA_STREAM_DTS2		= GF_4CC('D','T','S','2'),
+	GF_M2TS_RA_STREAM_DTS3		= GF_4CC('D','T','S','3'),
+	GF_M2TS_RA_STREAM_OPUS		= GF_4CC('O','p','u','s'),
+	GF_M2TS_RA_STREAM_DOVI		= GF_4CC('D','O','V','I'),
+	GF_M2TS_RA_STREAM_AVSA		= GF_4CC('A','V','S','A'), // AVS2-3 Audio
+	GF_M2TS_RA_STREAM_AVSV		= GF_4CC('A','V','S','V'), // AVS2-3 Video
+	GF_M2TS_RA_STREAM_AV1		= GF_4CC('A','V','0','1'),
+	GF_M2TS_RA_STREAM_SCTE35	= GF_4CC('C','U','E','I'),
 
-	GF_M2TS_RA_STREAM_GPAC	= GF_4CC('G','P','A','C')
+	GF_M2TS_RA_STREAM_GPAC		= GF_4CC('G','P','A','C'),
+	GF_M2TS_RA_STREAM_SRT		= GF_4CC('S','R','T',' '),
+	GF_M2TS_RA_STREAM_TXT		= GF_4CC('T','E','X','T'),
+	GF_M2TS_RA_STREAM_AC4		= GF_4CC('A','C','-','4'),
 };
 
 
@@ -347,17 +368,11 @@ typedef struct tag_m2ts_section_es GF_M2TS_SECTION_ES;
 /*! Maximum number of service in a TS*/
 #define GF_M2TS_MAX_SERVICES	65535
 
-/*! Maximum size of the buffer in UDP */
-#ifdef WIN32
-#define GF_M2TS_UDP_BUFFER_SIZE	0x80000
-#else
-//fixme - issues on linux and OSX with large stack size
-//we need to change default stack size for TS thread
-#define GF_M2TS_UDP_BUFFER_SIZE	0x40000
-#endif
-
 /*! Maximum PCR value */
 #define GF_M2TS_MAX_PCR	2576980377811ULL
+
+/*! Maximum PCR value in 90Khz scale */
+#define GF_M2TS_MAX_PCR_90K	8589934592
 
 /*! gets the stream name for an MPEG-2 stream type
 \param streamType the target stream type
@@ -495,6 +510,18 @@ enum
 	GF_M2TS_EVT_TEMI_LOCATION,
 	/*! a TEMI timecode has been found*/
 	GF_M2TS_EVT_TEMI_TIMECODE,
+
+	/*! a SCTE35 splice info has been found*/
+	GF_M2TS_EVT_SCTE35_SPLICE_INFO,
+
+	/*! a generic ID3 tag has been found*/
+	GF_M2TS_EVT_ID3,
+
+	/*! a generic section  has been found*/
+	GF_M2TS_EVT_SECTION,
+	/*! a generic section  has been updated*/
+	GF_M2TS_EVT_SECTION_UPDATE,
+
 	/*! a stream is about to be removed -  - associated parameter: pointer to GF_M2TS_ES being removed*/
 	GF_M2TS_EVT_STREAM_REMOVED
 };
@@ -599,7 +626,7 @@ enum metadata_carriage {
 	METADATA_CARRIAGE_OTHER			= 3
 };
 
-/*! MPEG-2 TS demuxer metadat pointer*/
+/*! MPEG-2 TS demuxer metadata pointer*/
 typedef struct tag_m2ts_metadata_pointer_descriptor {
 	u16 application_format;
 	u32 application_format_identifier;
@@ -686,6 +713,8 @@ typedef struct
 	/*! continuity counter check for pure PCR PIDs*/
 	s16 pcr_cc;
 
+	s64 pcr_base_offset;
+
 	void *user;
 } GF_M2TS_Program;
 
@@ -771,6 +800,7 @@ typedef struct
 	u64 DTS;
 	/*! size of PES header*/
 	u8 hdr_data_len;
+	u8 has_pts;
 } GF_M2TS_PESHeader;
 
 /*! Section elementary stream*/
@@ -817,6 +847,13 @@ typedef struct tag_m2ts_metadata_descriptor {
 	u8 *decoder_config_id;
 	u8 decoder_config_service_id;
 } GF_M2TS_MetadataDescriptor;
+
+enum {
+	GF_M2TS_AUDIO_SUBSTREAM_COMP = 1,
+	GF_M2TS_AUDIO_DESCRIPTION = 1<<1,
+	GF_M2TS_AUDIO_SUB_DESCRIPTION = 1<<2,
+	GF_M2TS_AUDIO_HEARING_IMPAIRED = 1<<3,
+};
 
 //! @cond Doxygen_Suppress
 
@@ -867,14 +904,15 @@ typedef struct tag_m2ts_pes
 	u32 last_pat_packet_number, before_last_pat_pn, before_last_pes_start_pn;
 
 	/*! PES reframer callback. If NULL, pes processing is skipped
-
-	returns the number of bytes NOT consumed from the input data buffer - these bytes are kept when reassembling the next PES packet*/
+	    returns the number of bytes NOT consumed from the input data buffer - these bytes are kept when reassembling the next PES packet*/
 	u32 (*reframe)(struct tag_m2ts_demux *ts, struct tag_m2ts_pes *pes, Bool same_pts, u8 *data, u32 data_len, GF_M2TS_PESHeader *hdr);
 
 	/*! DVB subtitling info*/
 	GF_M2TS_DVB_Subtitling_Descriptor sub;
 	/*! Metadata descriptor (for ID3)*/
 	GF_M2TS_MetadataDescriptor *metadata_descriptor;
+	/*! AVS3 Video descriptors*/
+	u8 avs3_video_descriptor[10];
 
 	/*! last received TEMI payload*/
 	u8 *temi_tc_desc;
@@ -882,14 +920,18 @@ typedef struct tag_m2ts_pes
 	u32 temi_tc_desc_len;
 	/*! allocated size of TEMI reception buffer*/
 	u32 temi_tc_desc_alloc_size;
-
 	/*! last decoded temi (may be one ahead of time as the last received TEMI)*/
 	GF_M2TS_TemiTimecodeDescriptor temi_tc;
 	/*! flag set to indicate a TEMI descriptor should be flushed with next packet*/
 	Bool temi_pending;
+
 	/*! flag set to indicate the last PES packet was not flushed (HLS) to avoid warning on same PTS/DTS used*/
 	Bool is_resume;
-	/*! DolbiVison info, last byte set to 1 if non-compatible signaling*/
+
+	Bool is_protected;
+	u32 audio_flags;
+
+	/*! DolbyVison info, last byte set to 1 if non-compatible signaling*/
 	u8 dv_info[25];
 
 	u64 map_utc, map_utc_pcr, map_pcr;
@@ -1064,6 +1106,8 @@ typedef struct
 	u32 pid;
 	/*parent stream if any/already declared*/
 	GF_M2TS_ES *stream;
+	//PCR plus one, 0 if no pcr
+	u64 pcr_plus_one;
 } GF_M2TS_TSPCK;
 
 typedef struct
@@ -1072,6 +1116,37 @@ typedef struct
 	u8 table_id;
 	u16 ex_table_id;
 } GF_M2TS_SectionInfo;
+
+typedef struct
+{
+	u8 version_number;
+	u8 table_id;
+	u16 ex_table_id;
+	u32 num_sections;
+	/*parent stream*/
+	GF_M2TS_ES *stream;
+	//section index from 0 to num_sections
+	u32 section_idx;
+	//section data
+	u8 *section_data;
+	u32 section_data_len;
+	//pts estimated at table completion
+	u64 pts;
+} GF_M2TS_GenericSectionInfo;
+
+
+/*! raw TS demux options*/
+typedef enum
+{
+	/*! regular demux mode */
+	GF_M2TS_RAW_NONE = 0,
+	/*! split mode: only demux PAT and create streams, forward all other packets */
+	GF_M2TS_RAW_SPLIT,
+	/*! forward mode: forward all TS packets after PCR extraction */
+	GF_M2TS_RAW_FORWARD,
+	/*! probe mode: only parse header */
+	GF_M2TS_RAW_PROBE,
+} GF_M2TSRawMode;
 
 /*! MPEG-2 TS demuxer*/
 struct tag_m2ts_demux
@@ -1136,6 +1211,7 @@ struct tag_m2ts_demux
 	struct __gf_dvb_mpe_ip_platform *ip_platform;
 	/*! current TS packet number*/
 	u32 pck_number;
+	u32 pck_errors;
 
 	/*! TS packet number of last seen packet containing PAT start */
 	u32 last_pat_start_num;
@@ -1156,10 +1232,8 @@ struct tag_m2ts_demux
 	/*! triggers all table reset*/
 	Bool table_reset;
 
-	/*! raw mode only parses PAT and PMT, and forward each packet as a GF_M2TS_EVT_PCK event, except PAT packets which must be recreated
-	if set, on_event shall be non-null
-	*/
-	Bool split_mode;
+	/*! raw demux mode */
+	GF_M2TSRawMode raw_mode;
 };
 
 //! @endcond
@@ -1473,7 +1547,7 @@ typedef struct __elementary_stream_ifce
 	u32 gpac_meta_dsi_size;
 	/*! GPAC unmapped meta codec decoder config*/
 	u8 *gpac_meta_dsi;
-	/*! GPAC unmapped meta codec name if knwon*/
+	/*! GPAC unmapped meta codec name if known*/
 	const char *gpac_meta_name;
 } GF_ESInterface;
 
@@ -1606,7 +1680,7 @@ typedef struct __m2ts_mux_stream {
 	is available in PES, don't copy from next*/
 	u32 min_bytes_copy_from_next;
 	/*! process PES or table update/framing
-	returns the priority of the stream,  0 meaning not scheduled, 1->N highest priority sent first*/
+	returns the priority of the stream, 0 meaning not scheduled, 1->N highest priority sent first*/
 	u32 (*process)(struct __m2ts_mux *muxer, struct __m2ts_mux_stream *stream);
 
 	/*! stream type*/
@@ -1679,6 +1753,9 @@ typedef struct __m2ts_mux_stream {
 	u32 latm_last_aac_time;
 	/*! list of GF_M2TSDescriptor to add to the MPEG-2 stream. By default set to NULL*/
 	GF_List *loop_descriptors;
+
+	/*! frame number for SRT encapsulation*/
+	u32 num_frame;
 
 	/*! packet SAP type when segmenting the TS*/
 	u32 pck_sap_type;
@@ -1767,15 +1844,14 @@ struct __m2ts_mux_program {
 };
 
 /*! AU packing per pes configuration*/
-typedef enum
-{
+GF_OPT_ENUM (GF_M2TS_PackMode,
 	/*! only audio AUs are packed in a single PES, video and systems are not (recommended default)*/
 	GF_M2TS_PACK_AUDIO_ONLY=0,
 	/*! never pack AUs in a single PES*/
 	GF_M2TS_PACK_NONE,
 	/*! always try to pack AUs in a single PES*/
-	GF_M2TS_PACK_ALL
-} GF_M2TS_PackMode;
+	GF_M2TS_PACK_ALL,
+);
 
 /*! MPEG-2 TS muxer*/
 struct __m2ts_mux {
@@ -1985,7 +2061,7 @@ GF_Err gf_m2ts_mux_use_single_au_pes_mode(GF_M2TS_Mux *muxer, GF_M2TS_PackMode a
 
 /*! sets initial PCR value for all programs in multiplex. If this is not called, each program will use a random initial PCR
 \param muxer the target MPEG-2 TS multiplexer
-\param init_pcr_value initial PCR value in 90kHz
+\param init_pcr_value initial PCR value in 27 MHz
 \return error if any
 */
 GF_Err gf_m2ts_mux_set_initial_pcr(GF_M2TS_Mux *muxer, u64 init_pcr_value);
@@ -2014,6 +2090,19 @@ void gf_m2ts_mux_program_force_keep_ts(GF_M2TS_Mux_Program *program);
 \param refresh_rate_ms the refresh rate for the SDT. A value of 0 only sends the SDT once
 */
 void gf_m2ts_mux_enable_sdt(GF_M2TS_Mux *muxer, u32 refresh_rate_ms);
+
+/*! update a given table
+\param stream target stream carrying the section
+\param table_id ID of the table
+\param table_id_extension extended ID of the table
+\param table_payload payload to send
+\param table_payload_length payload length to send
+\param use_syntax_indicator  inject section syntax extension (extended ID and fragmentation info of the table)
+\param private_indicator private indicator flag of section header
+*/
+void gf_m2ts_mux_table_update(GF_M2TS_Mux_Stream *stream, u8 table_id, u16 table_id_extension,
+                              u8 *table_payload, u32 table_payload_length,
+                              Bool use_syntax_indicator, Bool private_indicator);
 
 #endif /*GPAC_DISABLE_MPEG2TS_MUX*/
 

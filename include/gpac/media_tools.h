@@ -699,8 +699,7 @@ DASH profile constants
 
 Matches profile enum of dasher module: auto|live|onDemand|main|full|hbbtv1.5.live|dashavc264.live|dashavc264.onDemand
  */
-typedef enum
-{
+GF_OPT_ENUM (GF_DashProfile,
 	/*! auto profile, internal use only*/
 	GF_DASH_PROFILE_AUTO = 0,
 	/*! Live dash profile for: live for ISOFF, SIMPLE for M2TS */
@@ -720,7 +719,9 @@ typedef enum
 	GF_DASH_PROFILE_AVC264_ONDEMAND,
 	/*! industry profile DASH-IF ISOBMFF low latency */
 	GF_DASH_PROFILE_DASHIF_LL,
-} GF_DashProfile;
+	/*! industry profile DASH-IF CMAF Ingest */
+	GF_DASH_PROFILE_DASHIF_INGEST,
+ );
 
 
 /*!
@@ -738,7 +739,7 @@ typedef enum
 	/*! out of band parameter sets except PPS and APS, used for VVC */
 	GF_DASH_BSMODE_INBAND_PPS,
 	/*! both inband and out of band parameter sets */
-	GF_DASH_BSMODE_BOTH, //Romain
+	GF_DASH_BSMODE_BOTH,
 	/*! attempts to merge parameter sets in a single sample entry */
 	GF_DASH_BSMODE_MERGED,
 	/*! parameter sets are in different sample entries */
@@ -752,8 +753,7 @@ typedef enum
 DASH media presentation type
 \hideinitializer
  */
-typedef enum
-{
+GF_OPT_ENUM (GF_DashDynamicMode,
 	/*! DASH Presentation is static*/
 	GF_DASH_STATIC = 0,
 	/*! DASH Presentation is dynamic*/
@@ -762,21 +762,20 @@ typedef enum
 	GF_DASH_DYNAMIC_LAST,
 	/*! same as GF_DASH_DYNAMIC but prevents all segment cleanup */
 	GF_DASH_DYNAMIC_DEBUG,
-} GF_DashDynamicMode;
+);
 
 /*!
 DASH selector for content protection descriptor location
 \hideinitializer
  */
-typedef enum
-{
+GF_OPT_ENUM (GF_DASH_ContentLocationMode,
 	/*! content protection descriptor is at the adaptation set level*/
 	GF_DASH_CPMODE_ADAPTATION_SET=0,
 	/*! content protection descriptor is at the representation level*/
 	GF_DASH_CPMODE_REPRESENTATION,
 	/*! content protection descriptor is at the adaptation set and representation level*/
 	GF_DASH_CPMODE_BOTH,
-} GF_DASH_ContentLocationMode;
+);
 
 /*! DASH segmenter*/
 typedef struct __gf_dash_segmenter GF_DASHSegmenter;
@@ -960,8 +959,7 @@ GF_Err gf_dasher_set_initial_isobmf(GF_DASHSegmenter *dasher, u32 initial_moof_s
 
 
 /*! DASH PSSH storage mode*/
-typedef enum
-{
+GF_OPT_ENUM (GF_DASHPSSHMode,
 	//! PSSH box in moov only
 	GF_DASH_PSSH_MOOV = 0,
 	//! PSSH box in moof only
@@ -974,7 +972,7 @@ typedef enum
 	GF_DASH_PSSH_MPD,
 	//! Drop PSSH info from mpd and init seg
 	GF_DASH_PSSH_NONE,
-} GF_DASHPSSHMode;
+);
 
 /*!
  Configure how default values for ISOBMFF are stored
@@ -1136,6 +1134,14 @@ GF_Err gf_dasher_print_session_info(GF_DASHSegmenter *dasher, u32 fs_print_flags
 \return error if any
 */
 GF_Err gf_dasher_keep_source_utc(GF_DASHSegmenter *dasher, Bool keep_utc);
+
+/*!
+ Keeps hls info used in -crypt and pass to dasher
+\param dasher the DASH segmenter object
+\param hls_info use for HLS playlist in -crypt, if NULL no HLS info is set
+\return error if any
+*/
+GF_Err gf_dasher_set_hls_info(GF_DASHSegmenter *dasher, char *hls_info);
 
 #ifndef GPAC_DISABLE_ISOM_FRAGMENTS
 /*!

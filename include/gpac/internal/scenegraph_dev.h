@@ -112,6 +112,16 @@ typedef struct _nodepriv
 
 	/*holder for all interactive stuff - THIS IS DYNAMICALLY CREATED*/
 	struct _node_interactive_ext *interact;
+
+	/* list of GF_Node** entries pointing to cmd->node fields; nulled out in gf_node_free
+	   to prevent UAF when gf_sg_reset force-frees a node still referenced by a command -
+	   THIS IS DYNAMICALLY CREATED */
+	GF_List* referencing_commands;
+
+	/* list of GF_Proto* whose node_code list still references this node; purged in
+	   gf_node_free to prevent UAF when a node shared across proto node_code lists is
+	   force-freed by another proto's gf_sg_reset teardown - THIS IS DYNAMICALLY CREATED */
+	GF_List* referencing_protos;
 } NodePriv;
 
 
@@ -282,6 +292,10 @@ struct __tag_scene_graph
 	u32 (*get_document_class)(GF_SceneGraph *n);
 	struct __gf_filter_session *attached_session;
 #endif
+
+	/* list of GF_SceneGraph** entries pointing to cmd->in_scene fields necessary to avoid UAFs */
+	GF_List *referencing_commands;
+
 };
 
 void gf_sg_parent_setup(GF_Node *pNode);
@@ -938,7 +952,7 @@ void gf_dom_listener_reset_deferred(GF_SceneGraph *sg);
 
 void gf_node_delete_attributes(GF_Node *node);
 
-GF_Node *gf_xml_node_clone(GF_SceneGraph *inScene, GF_Node *orig, GF_Node *cloned_parent, char *inst_id, Bool deep);
+GF_Node *gf_sg_xml_node_clone(GF_SceneGraph *inScene, GF_Node *orig, GF_Node *cloned_parent, char *inst_id, Bool deep);
 
 GF_Err gf_dom_listener_del(GF_Node *listener, GF_DOMEventTarget *target);
 
@@ -957,4 +971,3 @@ GF_DOMEventTarget *gf_dom_event_get_target_from_node(GF_Node *n);
 #endif
 
 #endif	/*_GF_SCENEGRAPH_DEV_H_*/
-

@@ -2,7 +2,7 @@
  *			GPAC - Multimedia Framework C SDK
  *
  *			Authors: Jean Le Feuvre
- *			Copyright (c) Telecom ParisTech 2000-2024
+ *			Copyright (c) Telecom ParisTech 2000-2026
  *					All rights reserved
  *
  *  This file is part of GPAC / general OS configuration file
@@ -384,6 +384,36 @@ char * my_str_lwr(char *str);
 #define NULL 0
 #endif
 
+
+#ifdef GPAC_HAS_FD
+#ifndef WIN32
+#include <unistd.h>
+#define lseek_64 lseek
+#define O_BINARY 0
+#else
+#include <io.h>
+#define lseek_64 _lseeki64
+#endif
+#include <fcntl.h>
+#include <sys/stat.h>
+
+#if defined(WIN32) && !defined(open)
+#  define open _open
+#  define close _close
+#  define read _read
+#  define write _write
+#endif
+
+#if defined(WIN32) && !defined(S_IWUSR)
+#  define S_IWUSR _S_IWRITE
+#  define S_IRUSR _S_IREAD
+#  define S_IRGRP 0
+#  define S_IWGRP 0
+#  define S_IROTH 0
+# endif
+
+#endif
+
 //! @endcond
 
 
@@ -413,6 +443,12 @@ typedef u8 bin128[16];
 #define GF_INT_MAX			INT_MAX
 /*! min possible value for s32*/
 #define GF_INT_MIN			INT_MIN
+/*! max possible value for u64*/
+#define GF_UINT64_MAX		ULLONG_MAX
+/*! max possible value for s64*/
+#define GF_INT64_MAX		LLONG_MAX
+/*! min possible value for s64*/
+#define GF_INT64_MIN		LLONG_MIN
 
 #ifndef MIN
 /*! get the smallest of two numbers*/
@@ -423,7 +459,7 @@ typedef u8 bin128[16];
 #define MAX(X, Y) ((X)>(Y)?(X):(Y))
 #endif
 
-/*! get the absolute difference betwee two numbers*/
+/*! get the absolute difference between two numbers*/
 #define ABSDIFF(a, b)	( ( (a) > (b) ) ? ((a) - (b)) : ((b) - (a)) )
 
 #ifndef ABS
@@ -438,6 +474,10 @@ typedef enum {
 	GF_TRUE
 } Bool;
 #endif
+
+#define GF_OPT_ENUM(name, ...)						\
+        typedef enum { __VA_ARGS__ } name##_t;		\
+        typedef u32 name
 
 /*! 32 bit fraction*/
 typedef struct {
@@ -819,6 +859,36 @@ void* gf_realloc(void *ptr, size_t size);
 */
 size_t gf_strlcpy(char *dst, const char *src, size_t dsize);
 
+/*! concat source string to destination, ensuring 0-terminated string result
+\param dst  destination buffer
+\param src  source buffer
+\param dsize size of destination buffer
+\return same as strlcat
+*/
+size_t gf_strlcat(char *dst, const char *src, size_t dsize);
+
+/*! safe strcpy macro calling gf_strlcpy */
+#define gf_strcpy(_dst, _src) gf_strlcpy(_dst, _src, sizeof(_dst) / sizeof(_dst[0]) )
+/*! safe gf_strcat macro calling gf_strlcat */
+#define gf_strcat(_dst, _src) gf_strlcat(_dst, _src, sizeof(_dst) / sizeof(_dst[0]) )
+
+
+/*! by default always disable unsafe str functions*/
+#ifdef GPAC_DISABLE_UNSAFE_STRFUNC
+#undef strcpy
+#define strcpy #error "strcpy forbidden in libgpac - use gf_strcpy, gf_strlcpy or memcpy or undef GPAC_DISABLE_UNSAFE_STRFUNC before including GPAC headers"
+
+#undef strcat
+#define strcat #error "strcat forbidden in libgpac - use gf_strlcat, gf_strcat or memcpy or undef GPAC_DISABLE_UNSAFE_STRFUNC before including GPAC headers"
+
+#undef strncpy
+#define strncpy #error "strncpy forbidden in libgpac - use gf_strlcpy, gf_strcpy or memcpy or undef GPAC_DISABLE_UNSAFE_STRFUNC before including GPAC headers"
+
+#undef strncat
+#define strncat #error "strncat forbidden in libgpac - use gf_strlcat, gf_strcat or memcpy or undef GPAC_DISABLE_UNSAFE_STRFUNC before including GPAC headers"
+
+#endif //GPAC_DISABLE_UNSAFE_STRFUNC
+
 #ifdef GPAC_ASSERT_FATAL
 /*! fatal error assert, will always kill the program if condition is false
  \param _cond condition to test
@@ -856,6 +926,23 @@ size_t gf_strlcpy(char *dst, const char *src, size_t dsize);
 #define GPAC_ENABLE_DEBUG
 #endif
 #endif
+
+
+//! @cond Doxygen_Suppress
+/*needed for unittests (disabled)*/
+#ifndef GF_STATIC
+#define GF_STATIC static
+#endif
+#ifndef GF_NOT_EXPORTED
+#define GF_NOT_EXPORTED
+#endif
+//! @endcond
+
+#ifndef GPAC_DISABLE_ZLIB
+#define ZLIB_INFLATE_MAX_MULTIPLIER 32
+#define ZLIB_COMPRESS_SAFE 4
+#endif
+
 
 #ifdef __cplusplus
 }
