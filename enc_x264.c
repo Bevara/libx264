@@ -23,6 +23,7 @@ typedef struct
 	/* opts */
 	u32 bitrate;
 	const char *preset;
+	GF_Fraction gopdur;
 
 	GF_FilterPid *ipid, *opid;
 	u32 width, height, pixel_format, stride, stride_uv, nb_planes, uv_height;
@@ -131,6 +132,19 @@ static GF_Err x264enc_setup(GF_Filter *filter, GF_X264EncCtx *ctx)
 
 	param.rc.i_rc_method = X264_RC_ABR;
 	param.rc.i_bitrate = ctx->bitrate;
+
+	/* Bevara: forced key-frame interval, expressed in seconds so it does not
+	 * depend on the source frame rate. The DASH segmenter can only cut on a
+	 * SAP, so with libx264's default GOP (250 frames, ~10 s) the first segment
+	 * of a progressive/MSE session would only be ready after 10 s of video.
+	 * Setting it to the segment duration lets playback start after one
+	 * segment. Left at the libx264 default when gopdur is 0 or negative. */
+	if ((ctx->gopdur.num > 0) && ctx->gopdur.den) {
+		u32 keyint = (u32) ((u64) param.i_fps_num * ctx->gopdur.num / (param.i_fps_den * ctx->gopdur.den));
+		if (keyint < 1) keyint = 1;
+		param.i_keyint_max = keyint;
+		param.i_keyint_min = keyint;
+	}
 
 	/* no B-frames: keeps decoding order == display order, avoiding the
 	 * need to reorder output packets - the encoder already introduces
@@ -353,6 +367,8 @@ static GF_FilterArgs X264EncArgs[] =
 		{OFFS(bitrate), "target bitrate in kbps", GF_PROP_UINT, "1000", NULL, GF_FS_ARG_HINT_ADVANCED},
 		{OFFS(preset), "libx264 speed preset", GF_PROP_STRING, "veryfast",
 		 "ultrafast|superfast|veryfast|faster|fast|medium|slow|slower|veryslow", GF_FS_ARG_HINT_ADVANCED},
+		{OFFS(gopdur), "forced GOP duration in seconds - 0 keeps libx264's default (250 frames). "
+		 "Used by progressive/MSE playback so the segmenter can cut early", GF_PROP_FRACTION, "0/1", NULL, GF_FS_ARG_HINT_ADVANCED},
 		{0}};
 
 GF_FilterRegister X264EncRegister = {
