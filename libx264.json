@@ -10,6 +10,10 @@
     "filter_source":{
         "encx264" : "enc_x264.c"
     },
-    "licence_required":true,
-    "using": ["solver_1"]
+    "using": ["solver_1"],
+    "patents": {
+        "status": "licence-required",
+        "note": "H.264/AVC encoding: Via LA",
+        "checked": "2026-10-16"
+    }
 }
