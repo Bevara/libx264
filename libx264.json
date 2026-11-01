@@ -11,7 +11,7 @@
     "filter_source":{
         "encx264" : "enc_x264.c"
     },
-    "using": ["mm_solver_1.0.1"],
+    "using": ["mm_solver_1.0.1", "mm_solver_1.0.2"],
     "patents": {
         "status": "licence-required",
         "note": "H.264/AVC encoding: Via LA",
