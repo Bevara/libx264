@@ -1,5 +1,6 @@
 {
     "name": "libx264",
+    "version": "1.0.1",
     "description": "H.264/AVC encoder (native libx264)",
     "filters":["encx264"],
     "help": "This filter encodes a raw YUV420 video PID to H.264/AVC by calling libx264's native API directly, without going through FFmpeg.",
@@ -10,7 +11,7 @@
     "filter_source":{
         "encx264" : "enc_x264.c"
     },
-    "using": ["solver_1"],
+    "using": ["mm_solver_1.0.1"],
     "patents": {
         "status": "licence-required",
         "note": "H.264/AVC encoding: Via LA",
